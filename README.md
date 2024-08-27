@@ -1,2 +1,4 @@
 # Harleys TFD Tool
-Description: This script allows you to back up, restore keybindings, and delete/reset the 'TFD Saved' folder inside the 'M1' directory. Fixes: Tutorial bug and More Coming Soon  Made by: HarleyTG
+Description: This tool allows you to manage your GameUserSettings.ini file by providing options to back up, restore, and check the integrity of your settings. You can also delete or reset the 'TFD Saved' folder as needed.
+Fixes: Includes tutorial bug fixes and upcoming features.
+Made by: HarleyTG
