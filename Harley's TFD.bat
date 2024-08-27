@@ -228,8 +228,8 @@ echo       Welcome to the
 echo     Harley's TFD Tool v2
 echo ================================
 echo.
-echo Description: This script allows you to back up, restore GameUserSettings.ini, and delete/reset the 'TFD Saved' folder inside the 'M1' directory.
-echo Fixes: Tutorial bug and More Coming Soon
+echo Description: This tool allows you to manage your GameUserSettings.ini file by providing options to back up, restore, and check the integrity of your settings. You can also delete or reset the 'TFD Saved' folder as needed.
+echo Fixes: Includes tutorial bug fixes and upcoming features.
 echo Made by: HarleyTG
 echo.
 echo Press any key to continue...
