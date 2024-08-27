@@ -1,19 +1,15 @@
 @echo off
 title Harley's TFD Tool v2
 cls
+setlocal
+
+:: Constants
+set "settingsPath=%USERPROFILE%\AppData\Local\M1\Saved\Config\Windows\GameUserSettings.ini"
+set "backupBasePath=%USERPROFILE%\Documents\Harley's TFD\V2\%USERNAME%\Backup"
+set "savedFolder=%USERPROFILE%\AppData\Local\M1\Saved"
 
 :: Welcome Screen
-echo ================================
-echo       Welcome to the
-echo     Harley's TFD Tool v2
-echo ================================
-echo.
-echo Description: This script allows you to back up, restore keybindings, and delete/reset the 'TFD Saved' folder inside the 'M1' directory.
-echo Fixes: Tutorial bug and More Coming Soon
-echo Made by: HarleyTG
-echo.
-echo Press any key to continue...
-pause >nul
+call :welcomeScreen
 
 :mainMenu
 cls
@@ -21,144 +17,131 @@ echo ================================
 echo     Harley's TFD Tool v2
 echo ================================
 echo.
-echo [1] Backup Keybindings 
-echo [2] Restore Keybindings 
-echo [3] Delete/Reset 'TFD Saved' Folder 
-echo [4] Check Backup Integrity
-echo [5] Exit 
+echo [1] GameUserSettings Options
+echo [2] Delete/Reset 'TFD Saved' Folder 
+echo [3] Help
+echo [4] Exit 
 echo ================================
-set /p choice="Enter your choice [1/2/3/4/5]: "
+set /p choice="Enter your choice [1/2/3/4]: "
 
-if "%choice%"=="1" goto :backupKeybindings
-if "%choice%"=="2" goto :restoreKeybindings
-if "%choice%"=="3" goto :deleteSaved
-if "%choice%"=="4" goto :checkIntegrity
-if "%choice%"=="5" exit /b
+if "%choice%"=="1" goto :gameUserSettingsMenu
+if "%choice%"=="2" goto :deleteSaved
+if "%choice%"=="3" goto :helpMenu
+if "%choice%"=="4" goto :goodbye
 
 echo Invalid choice. Please try again.
 pause
 goto :mainMenu
 
-:backupKeybindings
-set "keybindingsPath=%USERPROFILE%\AppData\Local\M1\Saved\Config\Windows\GameUserSettings.ini"
-set "backupPath=%USERPROFILE%\Documents\Harley's TFD\V2\%USERNAME%\Backup"
+:gameUserSettingsMenu
+cls
+echo ================================
+echo     GameUserSettings Options
+echo ================================
+echo.
+echo [1] Backup GameUserSettings.ini 
+echo [2] Restore GameUserSettings.ini
+echo [3] Check Backup Integrity
+echo [4] Back to Main Menu
+echo ================================
+set /p choice="Enter your choice [1/2/3/4]: "
 
+if "%choice%"=="1" goto :backupGameUserSettings
+if "%choice%"=="2" goto :restoreGameUserSettings
+if "%choice%"=="3" goto :checkIntegrity
+if "%choice%"=="4" goto :mainMenu
+
+echo Invalid choice. Please try again.
+pause
+goto :gameUserSettingsMenu
+
+:backupGameUserSettings
+set "backupPath=%backupBasePath%"
 cls
 echo ================================
 echo     Harley's TFD Tool v2
 echo ================================
 echo.
-echo        Backing Up Keybindings
+echo        Backing Up GameUserSettings.ini
 echo ================================
 echo.
-echo Creating backup of keybindings...
+echo Creating backup of GameUserSettings.ini...
 
 :: Create backup directory if it doesn't exist
-if not exist "%backupPath%" (
-    echo Creating backup directory...
-    mkdir "%backupPath%"
-)
+if not exist "%backupPath%" mkdir "%backupPath%"
 
-call :showLoading "Backing up Keybindings" 30 "Backup in Progress" "Creating backup directory if needed"
+call :showLoading "Backing up GameUserSettings.ini" 30 "Backup in Progress" "Creating backup directory if needed"
+copy "%settingsPath%" "%backupPath%\GameUserSettings.ini" /y >nul
 
-copy "%keybindingsPath%" "%backupPath%\GameUserSettings.ini" /y >nul
 if exist "%backupPath%\GameUserSettings.ini" (
     echo.
     echo ================================
     echo     Backup Successful!
     echo ================================
-    echo.
 ) else (
     echo.
     echo ================================
     echo     Backup Failed!
     echo ================================
-    echo.
 )
 pause
-goto :mainMenu
+goto :gameUserSettingsMenu
 
-:restoreKeybindings
-set "keybindingsPath=%USERPROFILE%\AppData\Local\M1\Saved\Config\Windows\GameUserSettings.ini"
-set "backupPath=%USERPROFILE%\Documents\Harley's TFD\V2\%USERNAME%\Backup"
-
+:restoreGameUserSettings
+set "backupPath=%backupBasePath%"
 cls
 echo ================================
 echo     Harley's TFD Tool v2
 echo ================================
 echo.
-echo       Restoring Keybindings
+echo       Restoring GameUserSettings.ini
 echo ================================
 echo.
 echo Checking for existing backup...
-
-:: Check if the backup path exists
-if not exist "%backupPath%" (
-    echo.
-    echo ================================
-    echo Backup path not found: %backupPath%
-    echo ================================
-    echo.
-    pause
-    goto :mainMenu
-)
 
 :: Check if the backup file exists
 if not exist "%backupPath%\GameUserSettings.ini" (
     echo.
     echo ================================
-    echo Backup file not found in: %backupPath%
+    echo Backup file not found at: %backupPath%
     echo ================================
     echo.
     pause
-    goto :mainMenu
+    goto :gameUserSettingsMenu
 )
 
-:: Create the necessary directories if they do not exist
-for %%d in ("%USERPROFILE%\AppData\Local\M1\Saved\Config\Windows") do (
-    if not exist "%%d" (
-        echo Creating directory: %%d
-        mkdir "%%d"
-    )
-)
+:: Ensure necessary directories exist
+if not exist "%settingsPath%" mkdir "%settingsPath%"
 
-call :showLoading "Restoring Keybindings" 30 "Restoring" "Creating directories if needed"
+call :showLoading "Restoring GameUserSettings.ini" 30 "Restoring" "Creating directories if needed"
+copy "%backupPath%\GameUserSettings.ini" "%settingsPath%" /y >nul
 
-:: Attempt to restore the keybindings
-copy "%backupPath%\GameUserSettings.ini" "%keybindingsPath%" /y >nul
-if exist "%keybindingsPath%" (
+if exist "%settingsPath%" (
     echo.
     echo ================================
     echo     Restore Successful!
     echo ================================
-    echo.
 ) else (
     echo.
     echo ================================
-    echo     Restore Failed! Could not copy file to: %keybindingsPath%
+    echo     Restore Failed!
     echo ================================
-    echo.
 )
-
 pause
-goto :mainMenu
+goto :gameUserSettingsMenu
 
 :deleteSaved
-set "savedFolder=%USERPROFILE%\AppData\Local\M1\Saved"
-set "displayFolderName=TFD Saved Folder"
-
 cls
 echo ================================
 echo     Harley's TFD Tool v2
 echo ================================
 echo.
-echo    Deleting %displayFolderName%
+echo    Deleting TFD Saved Folder
 echo ================================
 echo.
 echo Please wait...
 
-call :showLoading "Deleting %displayFolderName%" 30 "Deleting" "Removing old saved folder"
-
+call :showLoading "Deleting TFD Saved Folder" 30 "Deleting" "Removing old saved folder"
 rmdir /s /q "%savedFolder%"
 
 if not exist "%savedFolder%" (
@@ -166,22 +149,16 @@ if not exist "%savedFolder%" (
     echo ================================
     echo     Deletion Successful!
     echo ================================
-    echo.
 ) else (
     echo.
     echo ================================
     echo   Deletion Failed!
     echo ================================
-    echo.
 )
-
 pause
 goto :mainMenu
 
 :checkIntegrity
-set "keybindingsPath=%USERPROFILE%\AppData\Local\M1\Saved\Config\Windows\GameUserSettings.ini"
-set "backupPath=%USERPROFILE%\Documents\Harley's TFD\V2\%USERNAME%\Backup"
-
 cls
 echo ================================
 echo     Harley's TFD Tool v2
@@ -191,8 +168,8 @@ echo    Checking Backup Integrity
 echo ================================
 echo.
 call :showLoading "Checking Integrity" 30 "Checking" "Comparing files"
+fc /b "%settingsPath%" "%backupPath%\GameUserSettings.ini" >nul
 
-fc /b "%keybindingsPath%" "%backupPath%\GameUserSettings.ini" >nul
 if %errorlevel%==0 (
     echo.
     echo ================================
@@ -206,7 +183,58 @@ if %errorlevel%==0 (
 )
 echo.
 pause
+goto :gameUserSettingsMenu
+
+:helpMenu
+cls
+echo ================================
+echo     Harley's TFD Tool v2
+echo ================================
+echo.
+echo     Interactive Help Menu
+echo ================================
+echo.
+echo [1] GameUserSettings Options:
+echo    - Backup GameUserSettings.ini: Create a backup of the GameUserSettings.ini file.
+echo    - Restore GameUserSettings.ini: Restore the GameUserSettings.ini file from a backup.
+echo    - Check Backup Integrity: Compare the current GameUserSettings.ini with the backup to ensure they are identical.
+echo.
+echo [2] Delete/Reset 'TFD Saved' Folder:
+echo    - This option deletes the 'TFD Saved' folder in the 'M1' directory, which can be useful for resetting or clearing out old data.
+echo.
+echo [3] Exit:
+echo    - Exit the tool and close the script.
+echo.
+echo Press any key to return to the main menu...
+pause >nul
 goto :mainMenu
+
+:goodbye
+cls
+echo ================================
+echo     Harley's TFD Tool v2
+echo ================================
+echo.
+echo   Thank you for using the tool!
+echo   Goodbye and see you next time!
+echo ================================
+timeout /t 5 /nobreak >nul
+exit /b
+
+:welcomeScreen
+cls
+echo ================================
+echo       Welcome to the
+echo     Harley's TFD Tool v2
+echo ================================
+echo.
+echo Description: This script allows you to back up, restore GameUserSettings.ini, and delete/reset the 'TFD Saved' folder inside the 'M1' directory.
+echo Fixes: Tutorial bug and More Coming Soon
+echo Made by: HarleyTG
+echo.
+echo Press any key to continue...
+pause >nul
+exit /b
 
 :showLoading
 :: Progress Bar Function
