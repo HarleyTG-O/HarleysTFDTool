@@ -4,7 +4,7 @@ cls
 setlocal enabledelayedexpansion
 
 :: Constants
-set "version=V2.5-Alpha"
+set "version=[V2.5-Alpha]"
 set "settingsPath=%USERPROFILE%\AppData\Local\M1\Saved\Config\Windows\"
 set "backupBasePath=%USERPROFILE%\Documents\Harley's TFD\V2\%USERNAME%\Backup"
 set "zipPath=%USERPROFILE%\Documents\Harley's TFD\V2\%USERNAME%\%USERNAME%_Transfer.zip"
@@ -26,7 +26,7 @@ call :welcomeScreen
 :mainMenu
 cls
 echo ================================
-echo     Harley's TFD Tool %version%
+echo     Harley's TFD Tool %Version%
 echo           Main Menu
 echo ================================
 echo.
@@ -80,7 +80,7 @@ goto :welcomeScreen
 :gameUserSettingsMenu
 cls
 echo ================================
-echo     Harley's TFD Tool %version%
+echo     Harley's TFD Tool %Version%
 echo ================================
 echo     GameUserSettings Options
 echo ================================
@@ -105,7 +105,7 @@ goto :gameUserSettingsMenu
 :backupGameUserSettings
 cls
 echo ================================
-echo     Harley's TFD Tool %version%
+echo     Harley's TFD Tool %Version%
 echo ================================
 echo     Backing Up GameUserSettings.ini
 echo ================================
@@ -146,7 +146,7 @@ goto :gameUserSettingsMenu
 :restoreGameUserSettings
 cls
 echo ================================
-echo     Harley's TFD Tool %version%
+echo     Harley's TFD Tool %Version%
 echo ================================
 echo     Restoring GameUserSettings.ini
 echo ================================
@@ -192,10 +192,10 @@ goto :gameUserSettingsMenu
 :displayVersion
 cls
 echo ================================
-echo     Harley's TFD Tool %version%
+echo     Harley's TFD Tool %Version%
 echo ================================
 echo.
-echo Current Version: %version%
+echo Current Version: %Version%
 echo ================================
 pause
 goto :mainMenu
@@ -203,7 +203,7 @@ goto :mainMenu
 :transferMenu
 cls
 echo ================================
-echo     Harley's TFD Tool %version%
+echo     Harley's TFD Tool %Version%
 echo ================================
 echo         Transfer Menu
 echo ================================
@@ -330,7 +330,7 @@ goto :mainMenu
 :helpMenu
 cls
 echo ================================
-echo     Harley's TFD Tool %version%
+echo     Harley's TFD Tool %Version%
 echo ================================
 echo         Help Menu
 echo ================================
@@ -372,7 +372,7 @@ for /L %%i in (1,1,%totalBars%) do (
     
     cls
     echo ================================
-    echo     Harley's TFD Tool %version%
+    echo     Harley's TFD Tool %Version%
     echo ================================
     echo.
     echo !bar!
@@ -398,7 +398,7 @@ exit /b
 :goodbye
 cls
 echo ================================
-echo     Harley's TFD Tool %version%
+echo     Harley's TFD Tool %Version%
 echo     Goodbye, @%USERNAME%
 echo ================================
 echo     Thank you for using Harley's TFD Tool %version%.
