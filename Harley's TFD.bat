@@ -304,40 +304,44 @@ echo ================================
 echo.
 call :showLoading "Deleting 'TFD Saved' Folder" 10 "Deleting folder" "Please wait while we delete the folder..."
 
+:: Define the full path to 'TFD Saved' folder
+set "folderPath=%settingsPath%TFD Saved"
+
 :: Check if the folder exists
-if not exist "%settingsPath%" (
-    call :log "Attempted to delete 'TFD Saved' folder at %settingsPath%, but folder does not exist."
+if not exist "%folderPath%" (
+    call :log "Attempted to delete 'TFD Saved' folder at %folderPath%, but folder does not exist."
     echo ERROR: Folder does not exist. Check the log file for details.
     pause
     goto :mainMenu
 )
 
 :: Delete the folder and its contents
-rmdir /s /q "%settingsPath%" >nul
+rmdir /s /q "%folderPath%" >nul
 if errorlevel 1 (
-    call :log "Failed to delete 'TFD Saved' folder at %settingsPath% with error code %errorlevel%."
+    call :log "Failed to delete 'TFD Saved' folder at %folderPath% with error code %errorlevel%."
     echo ERROR: Deletion failed. Check the log file for details.
     pause
     goto :mainMenu
 )
 
 :: Check if the folder was deleted successfully
-if exist "%settingsPath%" (
+if exist "%folderPath%" (
     echo.
     echo ================================
     echo     Folder Deletion Failed!
     echo ================================
-    call :log "Folder '%settingsPath%' still exists after delete attempt."
+    call :log "Folder '%folderPath%' still exists after delete attempt."
     echo Please check the log file for more details: %logFile%
 ) else (
     echo.
     echo ================================
     echo    Folder Deletion Successful!
     echo ================================
-    call :log "'TFD Saved' folder deleted successfully from %settingsPath%"
+    call :log "'TFD Saved' folder deleted successfully from %folderPath%"
 )
 pause
 goto :mainMenu
+
 
 :helpMenu
 cls
