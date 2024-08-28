@@ -1,4 +1,3 @@
-
 @echo off
 title Harley's TFD Tool
 cls
@@ -340,7 +339,6 @@ if exist "%settingsPath%" (
 pause
 goto :mainMenu
 
-
 :helpMenu
 cls
 echo ================================
@@ -419,3 +417,4 @@ echo     Thank you for using Harley's TFD Tool %version%.
 echo ================================
 echo.
 exit /b
+
