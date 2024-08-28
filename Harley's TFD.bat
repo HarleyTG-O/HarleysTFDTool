@@ -189,6 +189,37 @@ if exist "%settingsPath%\GameUserSettings.ini" (
 pause
 goto :gameUserSettingsMenu
 
+
+:checkIntegrity
+cls
+echo ================================
+echo     Harley's TFD Tool v2
+echo ================================
+echo.
+echo    Checking Backup Integrity
+echo ================================
+echo.
+call :showLoading "Checking Integrity" 30 "Checking" "Comparing files"
+fc /b "%settingsPath%" "%backupBasePath%\GameUserSettings.ini" >nul
+
+if %errorlevel%==0 (
+    echo.
+    echo ================================
+    echo Files are identical!
+    echo ================================
+    call :log "Backup integrity check: Files are identical."
+) else (
+    echo.
+    echo ================================
+    echo Files are different!
+    echo ================================
+    call :log "Backup integrity check: Files are different."
+)
+echo.
+pause
+goto :gameUserSettingsMenu
+
+
 :displayVersion
 cls
 echo ================================
