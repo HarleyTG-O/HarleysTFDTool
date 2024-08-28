@@ -360,8 +360,8 @@ set "message=%~1"
 set "totalSeconds=%~2"
 set "actionType=%~3"
 set "additionalMessage=%~4"
-set "totalBars=9"
-set "interval=1"  :: Interval is 1 second
+set "totalBars=30"  :: Number of bars
+set "interval=1"    :: Interval is 1 second
 set "timeRemaining=%totalSeconds%"
 
 :: Check if totalSeconds is greater than 0 to avoid division by zero
@@ -377,24 +377,21 @@ for /L %%i in (1,1,%totalBars%) do (
     timeout /t %interval% /nobreak >nul
 
     :: Update the time remaining
-    set /A "timeRemaining=totalSeconds - (%%i*totalSeconds/totalBars)"
+    set /A "timeRemaining-=interval"
     
     cls
     echo ================================
     echo     Harley's TFD Tool v2.5
     echo ================================
     echo.
-  for /l %%a in (1,1,%duration%) do (
-    timeout /t 1 >nul
-    set /a percent=(%%a*100)/%duration%
-    set /a remaining=%duration% - %%a
-    echo [%%a/%duration%] %loadingText% - %percent%%% complete
-    echo Time remaining: !remaining! seconds
-    echo Action: %actionType%
+    echo %message%
+    echo [%%i/%totalBars%] %actionType% - !percent!%% complete
+    echo Time remaining: !timeRemaining! seconds
     if defined additionalMessage echo %additionalMessage%
 )
-echo %finishText%
+endlocal
 goto :eof
+
 
 :log
 :: Log messages with timestamp
