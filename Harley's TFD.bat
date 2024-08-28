@@ -4,12 +4,13 @@ cls
 setlocal enabledelayedexpansion
 
 :: Constants
+set "version=V2.5-Alpha"
 set "settingsPath=%USERPROFILE%\AppData\Local\M1\Saved\Config\Windows\"
 set "backupBasePath=%USERPROFILE%\Documents\Harley's TFD\V2\%USERNAME%\Backup"
 set "zipPath=%USERPROFILE%\Documents\Harley's TFD\V2\%USERNAME%\%USERNAME%_Transfer.zip"
 set "logDir=%USERPROFILE%\Documents\Harley's TFD\V2\%USERNAME%\Logs"
 set "logFile=%logDir%\%USERNAME%-Support_Log-%DATE:~10,4%-%DATE:~4,2%-%DATE:~7,2%_%TIME:~0,2%-%TIME:~3,2%-%TIME:~6,2%.txt"
-set "version=V2.5-Alpha"
+
 
 :: Ensure log directory exists
 if not exist "%logDir%" (
