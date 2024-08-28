@@ -1,5 +1,5 @@
 @echo off
-title Harley's TFD Tool %version%
+title Harley's TFD Tool [%version%]
 cls
 setlocal enabledelayedexpansion
 
