@@ -373,9 +373,9 @@ for /L %%i in (1,1,%totalBars%) do (
     set /A "filledBars=%%i"
     set /A "emptyBars=%totalBars% - %%i"
 
-    :: Build the progress bar
-    for /L %%j in (1,1,!filledBars!) do set "bar=!bar!█"
-    for /L %%k in (1,1,!emptyBars!) do set "bar=!bar!░"
+    :: Build the progress bar with standard characters
+    for /L %%j in (1,1,!filledBars!) do set "bar=!bar!#"
+    for /L %%k in (1,1,!emptyBars!) do set "bar=!bar!_"
     
     :: Wait for the interval
     timeout /t %interval% /nobreak >nul
@@ -397,8 +397,6 @@ for /L %%i in (1,1,%totalBars%) do (
     if defined additionalMessage echo %additionalMessage%
 )
 echo Done!
-goto :eof
-
 goto :eof
 
 
