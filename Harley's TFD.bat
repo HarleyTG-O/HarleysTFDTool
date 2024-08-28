@@ -360,8 +360,8 @@ set "message=%~1"
 set "totalSeconds=%~2"
 set "actionType=%~3"
 set "additionalMessage=%~4"
-set "totalBars=30"  :: Number of bars
-set "interval=1"    :: Interval is 1 second
+set "totalBars=40"
+set "interval=1"  :: Interval is 1 second
 set "timeRemaining=%totalSeconds%"
 
 :: Check if totalSeconds is greater than 0 to avoid division by zero
@@ -370,14 +370,14 @@ if "%totalSeconds%"=="0" set "totalSeconds=1"
 for /L %%i in (1,1,%totalBars%) do (
     set /A "percent=%%i*100/totalBars"
     set "bar="
-    for /L %%j in (1,1,%%i) do set "bar=!bar![*]"
+    for /L %%j in (1,1,%%i) do set "bar=!bar!#"
     for /L %%k in (%%i+1,1,%totalBars%) do set "bar=!bar! "
 
     :: Wait for the interval
     timeout /t %interval% /nobreak >nul
 
     :: Update the time remaining
-    set /A "timeRemaining-=interval"
+    set /A "timeRemaining=totalSeconds - (%%i*totalSeconds/totalBars)"
     
     cls
     echo ================================
@@ -385,12 +385,15 @@ for /L %%i in (1,1,%totalBars%) do (
     echo ================================
     echo.
     echo %message%
-    echo [%%i/%totalBars%] %actionType% - !percent!%% complete
+    echo.
+    echo [!bar!] %percent%%% Complete
     echo Time remaining: !timeRemaining! seconds
+    echo Action: %actionType%
     if defined additionalMessage echo %additionalMessage%
 )
-endlocal
+echo Done!
 goto :eof
+
 
 
 :log
