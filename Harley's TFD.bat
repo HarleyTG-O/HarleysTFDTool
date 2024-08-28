@@ -55,7 +55,7 @@ goto :mainMenu
 cls
 echo ================================
 echo      Welcome @%USERNAME% To
-echo      Harley's TFD Tool v2.5
+echo      Harley's TFD Tool %Version%
 echo ================================
 echo.
 echo Manage and transfer your TFD settings with ease. 
