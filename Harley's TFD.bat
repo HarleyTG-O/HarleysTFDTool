@@ -370,8 +370,8 @@ if "%totalSeconds%"=="0" set "totalSeconds=1"
 for /L %%i in (1,1,%totalBars%) do (
     set /A "percent=%%i*100/totalBars"
     set "bar="
-    for /L %%j in (1,1,%%i) do set "bar=!bar!#"
-    for /L %%k in (%%i+1,1,%totalBars%) do set "bar=!bar! "
+    for /L %%j in (1,1,%%i) do set "bar=!bar!█"
+    for /L %%k in (%%i+1,1,%totalBars%) do set "bar=!bar!░"
 
     :: Wait for the interval
     timeout /t %interval% /nobreak >nul
