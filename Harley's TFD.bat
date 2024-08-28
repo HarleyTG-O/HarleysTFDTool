@@ -370,9 +370,13 @@ if "%totalSeconds%"=="0" set "totalSeconds=1"
 for /L %%i in (1,1,%totalBars%) do (
     set /A "percent=%%i*100/totalBars"
     set "bar="
-    for /L %%j in (1,1,%%i) do set "bar=!bar!█"
-    for /L %%k in (%%i+1,1,%totalBars%) do set "bar=!bar!░"
+    set /A "filledBars=%%i"
+    set /A "emptyBars=%totalBars% - %%i"
 
+    :: Build the progress bar
+    for /L %%j in (1,1,!filledBars!) do set "bar=!bar!█"
+    for /L %%k in (1,1,!emptyBars!) do set "bar=!bar!░"
+    
     :: Wait for the interval
     timeout /t %interval% /nobreak >nul
 
@@ -386,12 +390,15 @@ for /L %%i in (1,1,%totalBars%) do (
     echo.
     echo %message%
     echo.
-    echo [!bar!] %percent%%% Complete
+    echo [!bar!]
+    echo %percent%%% Complete
     echo Time remaining: !timeRemaining! seconds
     echo Action: %actionType%
     if defined additionalMessage echo %additionalMessage%
 )
 echo Done!
+goto :eof
+
 goto :eof
 
 
