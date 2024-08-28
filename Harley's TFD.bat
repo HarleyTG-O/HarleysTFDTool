@@ -352,14 +352,12 @@ echo ================================
 pause
 goto :mainMenu
 
-:showLoading
-:: Progress Bar Function
-:: Usage: call :showLoading "Message" totalSeconds actionType [additionalMessage]
+@echo off
 setlocal EnableDelayedExpansion
-set "message=%~1"
-set "totalSeconds=%~2"
-set "actionType=%~3"
-set "additionalMessage=%~4"
+
+:: Set variables
+set "message=Backing Up GameUserSettings.ini"
+set "totalSeconds=25"
 set "totalBars=40"
 set "interval=1"  :: Interval is 1 second
 set "timeRemaining=%totalSeconds%"
@@ -367,6 +365,7 @@ set "timeRemaining=%totalSeconds%"
 :: Check if totalSeconds is greater than 0 to avoid division by zero
 if "%totalSeconds%"=="0" set "totalSeconds=1"
 
+:: Progress bar loop
 for /L %%i in (1,1,%totalBars%) do (
     set /A "percent=%%i*100/totalBars"
     set "bar="
@@ -383,6 +382,7 @@ for /L %%i in (1,1,%totalBars%) do (
     :: Update the time remaining
     set /A "timeRemaining=totalSeconds - (%%i*totalSeconds/totalBars)"
     
+    :: Clear the screen and display the progress
     cls
     echo ================================
     echo     Harley's TFD Tool v2.5
@@ -393,11 +393,13 @@ for /L %%i in (1,1,%totalBars%) do (
     echo [!bar!]
     echo %percent%%% Complete
     echo Time remaining: !timeRemaining! seconds
-    echo Action: %actionType%
-    if defined additionalMessage echo %additionalMessage%
+    echo Action: Backing Up
+    echo Please wait while we create a backup...
 )
+
 echo Done!
-goto :eof
+pause
+
 
 
 
