@@ -1,40 +1,57 @@
 @echo off
-title Harley's TFD Tool v2
+title Harley's TFD Tool v2.5
 cls
-setlocal
+setlocal enabledelayedexpansion
 
 :: Constants
 set "settingsPath=%USERPROFILE%\AppData\Local\M1\Saved\Config\Windows\GameUserSettings.ini"
 set "backupBasePath=%USERPROFILE%\Documents\Harley's TFD\V2\%USERNAME%\Backup"
-set "savedFolder=%USERPROFILE%\AppData\Local\M1\Saved"
+set "zipPath=%USERPROFILE%\Documents\Harley's TFD\V2\%USERNAME%\%USERNAME%_Transfer.zip"
+set "logDir=%USERPROFILE%\Documents\Harley's TFD\V2\%USERNAME%\Logs"
+set "logFile=%logDir%\%USERNAME%-Support_Log-%DATE:~10,4%-%DATE:~4,2%-%DATE:~7,2%_%TIME:~0,2%-%TIME:~3,2%-%TIME:~6,2%.txt"
 
-:: Welcome Screen
+:: Ensure log directory exists
+if not exist "%logDir%" (
+    mkdir "%logDir%"
+)
+
+:: Initialize log file
+echo [%DATE% %TIME%] Harley's TFD Tool v2.5 [Started]. Logged in user @%USERNAME%. > "%logFile%"
+
+
+:: Display Welcome Screen
 call :welcomeScreen
 
 :mainMenu
 cls
 echo ================================
-echo     Harley's TFD Tool v2
+echo     Harley's TFD Tool v2.5
+echo           Main Menu
 echo ================================
 echo.
 echo [1] GameUserSettings Options
-echo [2] Delete/Reset 'TFD Saved' Folder 
-echo [3] Help
-echo [4] Exit 
+echo [2] Transfer (Zip/Unzip) Options
+echo [3] Delete/Reset 'TFD Saved' Folder 
+echo [4] Help
+echo [5] Exit 
 echo ================================
-set /p choice="Enter your choice [1/2/3/4]: "
+set /p choice="Enter your choice [1/2/3/4/5]: "
 
 if "%choice%"=="1" goto :gameUserSettingsMenu
-if "%choice%"=="2" goto :deleteSaved
-if "%choice%"=="3" goto :helpMenu
-if "%choice%"=="4" goto :goodbye
+if "%choice%"=="2" goto :transferMenu
+if "%choice%"=="3" goto :deleteSaved
+if "%choice%"=="4" goto :helpMenu
+if "%choice%"=="5" goto :goodbye
 
+call :log "Invalid choice in main menu: %choice%"
 echo Invalid choice. Please try again.
 pause
 goto :mainMenu
 
 :gameUserSettingsMenu
 cls
+echo ================================
+echo     Harley's TFD Tool v2.5
 echo ================================
 echo     GameUserSettings Options
 echo ================================
@@ -51,97 +68,149 @@ if "%choice%"=="2" goto :restoreGameUserSettings
 if "%choice%"=="3" goto :checkIntegrity
 if "%choice%"=="4" goto :mainMenu
 
+call :log "Invalid choice in GameUserSettings menu: %choice%"
 echo Invalid choice. Please try again.
 pause
 goto :gameUserSettingsMenu
 
-:backupGameUserSettings
-set "backupPath=%backupBasePath%"
+:transferMenu
 cls
 echo ================================
-echo     Harley's TFD Tool v2
+echo     Harley's TFD Tool v2.5
+echo ================================
+echo         Transfer Menu
 echo ================================
 echo.
-echo        Backing Up GameUserSettings.ini
-echo ================================
+echo Easily transfer between PC's TFD Settings and more.
+echo Note: [Extract Transfer Zip] When u add it to another PC it can Be Detected From Downloads
 echo.
-echo Creating backup of GameUserSettings.ini...
+echo [1] Create Transfer Zip
+echo [2] Extract Transfer Zip
+echo [3] Back to Main Menu
+echo ================================
+set /p choice="Enter your choice [1/2/3]: "
 
-:: Create backup directory if it doesn't exist
-if not exist "%backupPath%" mkdir "%backupPath%"
+if "%choice%"=="1" goto :createTransferZip
+if "%choice%"=="2" goto :extractTransferZip
+if "%choice%"=="3" goto :mainMenu
 
-call :showLoading "Backing up GameUserSettings.ini" 30 "Backup in Progress" "Creating backup directory if needed"
-copy "%settingsPath%" "%backupPath%\GameUserSettings.ini" /y >nul
-
-if exist "%backupPath%\GameUserSettings.ini" (
-    echo.
-    echo ================================
-    echo     Backup Successful!
-    echo ================================
-) else (
-    echo.
-    echo ================================
-    echo     Backup Failed!
-    echo ================================
-)
+call :log "Invalid choice in Transfer menu: %choice%"
+echo Invalid choice. Please try again.
 pause
-goto :gameUserSettingsMenu
+goto :transferMenu
 
-:restoreGameUserSettings
-set "backupPath=%backupBasePath%"
+:createTransferZip
 cls
 echo ================================
-echo     Harley's TFD Tool v2
+echo     Creating Transfer Zip
 echo ================================
 echo.
-echo       Restoring GameUserSettings.ini
-echo ================================
-echo.
-echo Checking for existing backup...
+call :showLoading "Creating Transfer Zip" 30 "Creating Zip" "Please wait while we create the zip file..."
 
-:: Check if the backup file exists
-if not exist "%backupPath%\GameUserSettings.ini" (
-    echo.
-    echo ================================
-    echo Backup file not found at: %backupPath%
-    echo ================================
-    echo.
+:: Ensure the backup directory exists
+if not exist "%backupBasePath%" (
+    call :log "Failed to create transfer zip: Backup directory not found at %backupBasePath%."
+    echo Backup directory not found. Please check the path and try again.
     pause
-    goto :gameUserSettingsMenu
+    goto :transferMenu
 )
 
-:: Ensure necessary directories exist
-if not exist "%settingsPath%" mkdir "%settingsPath%"
+:: Create the zip file using PowerShell with detailed error reporting
+powershell -Command ^
+    "$sourcePath = \"%backupBasePath%\"; $destinationPath = \"%zipPath%\"; try { Compress-Archive -Path $sourcePath -DestinationPath $destinationPath -Force } catch { Write-Host \"Failed to create transfer zip: $($_.Exception.Message)\"; exit 1 }" 2>>"%logFile%"
 
-call :showLoading "Restoring GameUserSettings.ini" 30 "Restoring" "Creating directories if needed"
-copy "%backupPath%\GameUserSettings.ini" "%settingsPath%" /y >nul
-
-if exist "%settingsPath%" (
+:: Check if the zip file was created successfully
+if exist "%zipPath%" (
     echo.
     echo ================================
-    echo     Restore Successful!
+    echo     Zip Creation Successful!
     echo ================================
+    call :log "Transfer zip created successfully: %zipPath%"
 ) else (
     echo.
     echo ================================
-    echo     Restore Failed!
+    echo     Zip Creation Failed!
     echo ================================
+    call :log "Failed to create transfer zip: Unknown error."
+    echo Please check the log file for more details: %logFile%
 )
 pause
-goto :gameUserSettingsMenu
+goto :transferMenu
+
+:extractTransferZip
+cls
+echo ================================
+echo     Harley's TFD Tool v2.5
+echo ================================
+echo     Extracting Transfer Zip
+echo ================================
+echo.
+echo Select the location of the zip file:
+echo [1] Current Location (Backup Directory)
+echo [2] Downloads Folder
+echo ================================
+set /p locationChoice="Enter your choice [1/2]: "
+
+:: Set default zip path for current location
+set "zipPath=%USERPROFILE%\Documents\Harley's TFD\V2\%USERNAME%\%USERNAME%_Transfer.zip"
+
+:: Update zip path based on user choice
+if "%locationChoice%"=="2" (
+    set "zipPath=C:\%USERNAME%\Downloads\%USERNAME%_Transfer.zip"
+)
+
+:: Show loading screen
+call :showLoading "Extracting Transfer Zip" 30 "Extracting Zip" "Please wait while we extract the zip file..."
+
+:: Ensure the zip file exists
+if not exist "%zipPath%" (
+    call :log "Failed to extract transfer zip: Zip file not found at %zipPath%"
+    echo Transfer zip file not found at: %zipPath%
+    pause
+    goto :transferMenu
+)
+
+:: Ensure the backup directory exists
+if not exist "%backupBasePath%" (
+    mkdir "%backupBasePath%"
+)
+
+:: Extract the zip file using PowerShell with detailed error reporting
+powershell -Command ^
+    "$sourcePath = \"%zipPath%\"; $destinationPath = \"%backupBasePath%\"; try { Expand-Archive -Path $sourcePath -DestinationPath $destinationPath -Force } catch { Write-Host \"Failed to extract transfer zip: $($_.Exception.Message)\"; exit 1 }" 2>>"%logFile%"
+
+:: Check if the files were extracted successfully
+if exist "%backupBasePath%\GameUserSettings.ini" (
+    echo.
+    echo ================================
+    echo     Extraction Successful!
+    echo ================================
+    call :log "Transfer zip extracted successfully: %zipPath%"
+) else (
+    echo.
+    echo ================================
+    echo     Extraction Failed!
+    echo ================================
+    call :log "Failed to extract transfer zip: Unknown error."
+    echo Please check the log file for more details: %logFile%
+)
+pause
+goto :transferMenu
+
 
 :deleteSaved
 cls
 echo ================================
-echo     Harley's TFD Tool v2
+echo     Harley's TFD Tool v2.5
 echo ================================
 echo.
 echo    Deleting TFD Saved Folder
 echo ================================
 echo.
-echo Please wait...
-
 call :showLoading "Deleting TFD Saved Folder" 30 "Deleting" "Removing old saved folder"
+
+:: Ensure savedFolder variable is defined
+set "savedFolder=%USERPROFILE%\AppData\Local\M1\Saved"
 rmdir /s /q "%savedFolder%"
 
 if not exist "%savedFolder%" (
@@ -149,11 +218,13 @@ if not exist "%savedFolder%" (
     echo ================================
     echo     Deletion Successful!
     echo ================================
+    call :log "TFD Saved folder deleted successfully."
 ) else (
     echo.
     echo ================================
     echo   Deletion Failed!
     echo ================================
+    call :log "Failed to delete TFD Saved folder."
 )
 pause
 goto :mainMenu
@@ -161,25 +232,28 @@ goto :mainMenu
 :checkIntegrity
 cls
 echo ================================
-echo     Harley's TFD Tool v2
+echo     Harley's TFD Tool v2.5
 echo ================================
 echo.
 echo    Checking Backup Integrity
 echo ================================
 echo.
-call :showLoading "Checking Integrity" 30 "Checking" "Comparing files"
-fc /b "%settingsPath%" "%backupPath%\GameUserSettings.ini" >nul
+call :showLoading "Checking Backup Integrity" 30 "Checking" "Comparing files"
+
+fc /b "%settingsPath%" "%backupBasePath%\GameUserSettings.ini" >nul
 
 if %errorlevel%==0 (
     echo.
     echo ================================
     echo Files are identical!
     echo ================================
+    call :log "Backup integrity check: Files are identical."
 ) else (
     echo.
     echo ================================
     echo Files are different!
     echo ================================
+    call :log "Backup integrity check: Files are different."
 )
 echo.
 pause
@@ -188,10 +262,10 @@ goto :gameUserSettingsMenu
 :helpMenu
 cls
 echo ================================
-echo     Harley's TFD Tool v2
+echo     Harley's TFD Tool v2.5
 echo ================================
 echo.
-echo     Interactive Help Menu
+echo        Interactive Help 
 echo ================================
 echo.
 echo [1] GameUserSettings Options:
@@ -199,42 +273,73 @@ echo    - Backup GameUserSettings.ini: Create a backup of the GameUserSettings.i
 echo    - Restore GameUserSettings.ini: Restore the GameUserSettings.ini file from a backup.
 echo    - Check Backup Integrity: Compare the current GameUserSettings.ini with the backup to ensure they are identical.
 echo.
-echo [2] Delete/Reset 'TFD Saved' Folder:
-echo    - This option deletes the 'TFD Saved' folder in the 'M1' directory, which can be useful for resetting or clearing out old data.
+echo [2] Transfer (Zip/Unzip) Options:
+echo    - Create Transfer Zip: Create a zip file of the GameUserSettings.ini backup for easy transfer.
+echo    - Extract Transfer Zip: Extract the zip file back into the backup folder for restoration.
 echo.
-echo [3] Exit:
+echo [3] Delete/Reset 'TFD Saved' Folder:
+echo    - This option deletes the 'TFD Saved' folder to reset the game's settings.
+echo.
+echo [4] Help:
+echo    - Provides this help menu.
+echo.
+echo [5] Exit:
 echo    - Exit the tool and close the script.
-echo.
-echo Press any key to return to the main menu...
-pause >nul
+echo ================================
+pause
 goto :mainMenu
-
-:goodbye
-cls
-echo ================================
-echo     Harley's TFD Tool v2
-echo ================================
-echo.
-echo   Thank you for using the tool!
-echo   Goodbye and see you next time!
-echo ================================
-timeout /t 5 /nobreak >nul
-exit /b
 
 :welcomeScreen
 cls
 echo ================================
-echo       Welcome to the
-echo     Harley's TFD Tool v2
+echo      Welcome @%USERNAME% To
+echo      Harley's TFD Tool v2.5
 echo ================================
 echo.
-echo Description: This tool allows you to manage your GameUserSettings.ini file by providing options to back up, restore, and check the integrity of your settings. You can also delete or reset the 'TFD Saved' folder as needed.
-echo Fixes: Includes tutorial bug fixes and upcoming features.
-echo Made by: HarleyTG
+echo Manage and transfer your TFD settings with ease. 
+echo Choose an option from the menu to get started.
+echo If Support Needed Check ur 
+echo %logDir% 
+echo for Your Log File and DM @HarleyTG on Discord
 echo.
-echo Press any key to continue...
-pause >nul
-exit /b
+echo [1] Start: Harley's TFD Tool v2.5: Access the main functionality.
+echo [2] Exit: Close the tool.
+echo ================================
+set /p choice="Enter your choice [1/2]: "
+
+if "%choice%"=="1" goto :mainMenu
+if "%choice%"=="2" goto :goodbye
+
+call :log "Invalid choice in welcome screen: %choice%"
+echo Invalid choice. Please try again.
+pause
+goto :welcomeScreen
+
+:goodbye
+cls
+echo ================================
+echo     Harley's TFD Tool v2.5
+echo ================================
+echo.
+echo     Goodbye, %USERNAME%!
+echo ================================
+echo.
+echo Thank you for using Harley's TFD Tool v2.5.
+echo ================================
+echo.
+
+:: Call the loading function for 5 seconds
+call :showLoading "Shutting down..." 5 "Shutdown" "Please wait while we close the tool..."
+
+:: Ensure logs are recorded before exiting
+call :log "Harley's TFD Tool v2.5 closed by user."
+call :log "Harley's TFD Tool v2.5 [Ended]"
+
+:: Exit the script completely
+exit
+
+
+
 
 :showLoading
 :: Progress Bar Function
@@ -247,6 +352,9 @@ set "additionalMessage=%~4"
 set "totalBars=9"
 set "interval=1"  :: Interval is 1 second
 set "timeRemaining=%totalSeconds%"
+
+:: Check if totalSeconds is greater than 0 to avoid division by zero
+if "%totalSeconds%"=="0" set "totalSeconds=1"
 
 for /L %%i in (1,1,%totalBars%) do (
     set /A "percent=%%i*100/totalBars"
@@ -262,7 +370,7 @@ for /L %%i in (1,1,%totalBars%) do (
     
     cls
     echo ================================
-    echo     Harley's TFD Tool v2
+    echo     Harley's TFD Tool v2.5
     echo ================================
     echo.
     echo !bar!
@@ -275,3 +383,10 @@ for /L %%i in (1,1,%totalBars%) do (
 endlocal
 exit /b
 
+:log
+:: Log Function
+:: Usage: call :log "Message"
+setlocal
+echo [%DATE% %TIME%] %~1 >> "%logFile%"
+endlocal
+exit /b
