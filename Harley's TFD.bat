@@ -384,9 +384,12 @@ for /L %%i in (1,1,%totalBars%) do (
     echo     Harley's TFD Tool v2.5
     echo ================================
     echo.
-    echo !bar!
-    echo %message%: !percent!%% complete
-    echo Time remaining: !timeRemaining! seconds
+  for /l %%a in (1,1,%duration%) do (
+    timeout /t 1 >nul
+    set /a percent=(%%a*100)/%duration%
+    set /a remaining=%duration% - %%a
+    echo [%%a/%duration%] %loadingText% - %percent%%% complete
+    echo Time remaining: !remaining! seconds
     echo Action: %actionType%
     if defined additionalMessage echo %additionalMessage%
 )
