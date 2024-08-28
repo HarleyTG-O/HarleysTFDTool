@@ -1,3 +1,4 @@
+
 @echo off
 title Harley's TFD Tool
 cls
@@ -26,7 +27,7 @@ call :welcomeScreen
 :mainMenu
 cls
 echo ================================
-echo     Harley's TFD Tool %Version%
+echo   Harley's TFD Tool %Version%
 echo           Main Menu
 echo ================================
 echo.
@@ -54,8 +55,8 @@ goto :mainMenu
 :welcomeScreen
 cls
 echo ================================
-echo      Welcome @%USERNAME% To
-echo      Harley's TFD Tool %Version%
+echo     Welcome @%USERNAME% To
+echo   Harley's TFD Tool %Version%
 echo ================================
 echo.
 echo Manage and transfer your TFD settings with ease. 
@@ -64,7 +65,7 @@ echo If Support Needed Check your
 echo %logDir% 
 echo for Your Log File and DM @HarleyTG on Discord
 echo.
-echo [1] Start: Harley's TFD Tool v2.5: Access the main functionality.
+echo [1] Start: Harley's TFD Tool %Version%: Access the main functionality.
 echo [2] Exit: Close the tool.
 echo ================================
 set /p choice="Enter your choice [1/2]: "
@@ -80,7 +81,7 @@ goto :welcomeScreen
 :gameUserSettingsMenu
 cls
 echo ================================
-echo     Harley's TFD Tool %Version%
+echo   Harley's TFD Tool %Version%
 echo ================================
 echo     GameUserSettings Options
 echo ================================
@@ -105,9 +106,9 @@ goto :gameUserSettingsMenu
 :backupGameUserSettings
 cls
 echo ================================
-echo     Harley's TFD Tool %Version%
+echo   Harley's TFD Tool %Version%
 echo ================================
-echo     Backing Up GameUserSettings.ini
+echo Backing Up GameUserSettings.ini
 echo ================================
 echo.
 
@@ -146,9 +147,9 @@ goto :gameUserSettingsMenu
 :restoreGameUserSettings
 cls
 echo ================================
-echo     Harley's TFD Tool %Version%
+echo   Harley's TFD Tool %Version%
 echo ================================
-echo     Restoring GameUserSettings.ini
+echo  Restoring GameUserSettings.ini
 echo ================================
 echo.
 
@@ -192,10 +193,10 @@ goto :gameUserSettingsMenu
 :displayVersion
 cls
 echo ================================
-echo     Harley's TFD Tool %Version%
+echo    Harley's TFD Tool %Version%
 echo ================================
 echo.
-echo Current Version: %Version%
+echo   Current Version: %Version%
 echo ================================
 pause
 goto :mainMenu
@@ -203,7 +204,7 @@ goto :mainMenu
 :transferMenu
 cls
 echo ================================
-echo     Harley's TFD Tool %Version%
+echo   Harley's TFD Tool %Version%
 echo ================================
 echo         Transfer Menu
 echo ================================
@@ -229,6 +230,7 @@ goto :transferMenu
 :createTransferZip
 cls
 echo ================================
+echo   Harley's TFD Tool %Version%
 echo     Creating Transfer Zip
 echo ================================
 echo.
@@ -262,6 +264,7 @@ goto :transferMenu
 :extractTransferZip
 cls
 echo ================================
+echo   Harley's TFD Tool %Version%
 echo     Extracting Transfer Zip
 echo ================================
 echo.
@@ -295,27 +298,27 @@ goto :transferMenu
 :deleteSaved
 cls
 echo ================================
-echo     Deleting 'TFD Saved' Folder
+echo   Harley's TFD Tool %Version%
+echo ================================
+echo   Deleting 'TFD Saved' Folder
 echo ================================
 echo.
-call :showLoading "Deleting 'TFD Saved' Folder" 10 "Deleting Folder" "Please wait while we delete the folder..."
+call :showLoading "Deleting 'TFD Saved' Folder" 10 "Deleting folder" "Please wait while we delete the folder..."
 
-:: Delete the 'TFD Saved' folder
-rd /s /q "%USERPROFILE%\Documents\Harley's TFD\%USERNAME%" >nul
+:: Delete the folder and its contents
+rmdir /s /q "%settingsPath%" >nul
 if errorlevel 1 (
-    call :log "Failed to delete 'TFD Saved' folder."
-    echo ERROR: Folder deletion failed. Check the log file for details.
+    call :log "Failed to delete 'TFD Saved' folder at %settingsPath%"
+    echo ERROR: Deletion failed. Check the log file for details.
     pause
     goto :mainMenu
 )
 
-:: Check if the folder was deleted successfully
-if not exist "%USERPROFILE%\Documents\Harley's TFD\%USERNAME%" (
-    echo.
-    echo ================================
-    echo     Folder Deleted Successfully!
-    echo ================================
-    call :log "'TFD Saved' folder deleted successfully."
+echo.
+echo ================================
+echo    Folder Deletion Successful!
+echo ================================
+call :log "'TFD Saved' folder deleted successfully from %settingsPath%"
 ) else (
     echo.
     echo ================================
@@ -405,4 +408,3 @@ echo     Thank you for using Harley's TFD Tool %version%.
 echo ================================
 echo.
 exit /b
-
