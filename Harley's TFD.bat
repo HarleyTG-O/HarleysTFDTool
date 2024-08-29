@@ -72,12 +72,13 @@ echo   Harley's TFD Tool %version%
 echo ================================
 echo.
 echo Manage and transfer your TFD settings with ease. 
-echo Choose an option from the menu to get started.
-echo If support is needed, check your
-echo %logDir% 
-echo for your log file and DM @HarleyTG on Discord
 echo.
-echo [1] Start: Harley's TFD Tool %version%.
+echo If support is needed, check your
+echo [%logDir%]
+echo for your log file and DM @HarleyTG on Discord.
+echo.
+echo Choose an option from the menu to get started.
+echo [1] Start: Harley's TFD Tool.
 echo [2] Exit: Close the tool.
 echo ================================
 set /p choice="Enter your choice [1/2]: "
