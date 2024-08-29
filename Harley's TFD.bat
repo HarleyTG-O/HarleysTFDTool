@@ -403,15 +403,20 @@ echo Your actions during this session were logged to:
 echo %logFile%
 echo.
 call :log "Session ended for user @%USERNAME%."
+
+:: Simulate a "press any key to exit" button
+echo.
+echo Press any key to exit...
 pause >nul
 
-:: Ensure the script exits
-exit /b 0
+:: Forcefully exit the script
+exit 0
 
 :: Function to log messages
 :log
 echo %~1 >> %logFile%
 exit /b
+
 
 
 :showLoading
