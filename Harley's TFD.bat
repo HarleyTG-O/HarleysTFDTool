@@ -404,7 +404,15 @@ echo %logFile%
 echo.
 call :log "Session ended for user @%USERNAME%."
 pause >nul
+
+:: Ensure the script exits
 exit /b 0
+
+:: Function to log messages
+:log
+echo %~1 >> %logFile%
+exit /b
+
 
 :showLoading
 :: Arguments: [1] Message [2] Total Seconds [3] Action Type [4] Additional Message
