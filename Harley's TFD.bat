@@ -8,9 +8,22 @@ setlocal enabledelayedexpansion
 set "version=[V2.5-Alpha]"
 set "settingsPath=%USERPROFILE%\AppData\Local\M1\Saved\Config\Windows\"
 set "backupBasePath=%USERPROFILE%\Documents\Harley's TFD\V2\%USERNAME%\Backup"
-set "zipPath=%USERPROFILE%\Documents\Harley's TFD\V2\%USERNAME%\%USERNAME%_Transfer.zip"
+set "zipPath=%USERPROFILE%\Documents\Harley's TFD\V2\%USERNAME%\%USERNAME%_HTFD-Transfer.zip"
 set "logDir=%USERPROFILE%\Documents\Harley's TFD\V2\%USERNAME%\Logs"
-set "logFile=%logDir%\%USERNAME%-Support_Log-%DATE:~10,4%-%DATE:~4,2%-%DATE:~7,2%_%TIME:~0,2%-%TIME:~3,2%-%TIME:~6,2%.txt"
+
+
+:: Get current date and time
+for /f "tokens=2 delims==" %%I in ('"wmic os get localdatetime /value"') do set "datetime=%%I"
+set "year=%datetime:~0,4%"
+set "month=%datetime:~4,2%"
+set "day=%datetime:~6,2%"
+set "hour=%datetime:~8,2%"
+set "minute=%datetime:~10,2%"
+set "second=%datetime:~12,2%"
+
+:: Define log file name with formatted date and time
+set "logFile=%logDir%\%USERNAME%-Support_Log[%year%-%month%-%day%_%hour%-%minute%-%second%].txt"
+
 
 :: Ensure log directory exists
 if not exist "%logDir%" (
@@ -64,7 +77,7 @@ echo If support is needed, check your
 echo %logDir% 
 echo for your log file and DM @HarleyTG on Discord
 echo.
-echo [1] Start: Harley's TFD Tool %version%: Access the main functionality.
+echo [1] Start: Harley's TFD Tool %version%.
 echo [2] Exit: Close the tool.
 echo ================================
 set /p choice="Enter your choice [1/2]: "
@@ -82,7 +95,7 @@ cls
 echo ================================
 echo   Harley's TFD Tool %version%
 echo ================================
-echo     GameUserSettings Options
+echo    GameUserSettings Options
 echo ================================
 echo.
 echo [1] Backup GameUserSettings.ini 
@@ -129,13 +142,13 @@ if errorlevel 1 (
 if exist "%backupBasePath%\GameUserSettings.ini" (
     echo.
     echo ================================
-    echo     Backup Successful!
+    echo        Backup Successful!
     echo ================================
     call :log "GameUserSettings.ini backed up successfully from %settingsPath% to %backupBasePath%"
 ) else (
     echo.
     echo ================================
-    echo     Backup Failed!
+    echo         Backup Failed!
     echo ================================
     call :log "Backup file not found after backup operation."
     echo ERROR: Backup failed. Check the log file for details.
@@ -175,13 +188,13 @@ if errorlevel 1 (
 if exist "%settingsPath%\GameUserSettings.ini" (
     echo.
     echo ================================
-    echo     Restore Successful!
+    echo      Restore Successful!
     echo ================================
     call :log "GameUserSettings.ini restored successfully from %backupBasePath% to %settingsPath%"
 ) else (
     echo.
     echo ================================
-    echo     Restore Failed!
+    echo        Restore Failed!
     echo ================================
     call :log "Restore file not found after restore operation."
     echo ERROR: Restore failed. Check the log file for details.
@@ -264,10 +277,31 @@ echo   Harley's TFD Tool %version%
 echo     Creating Transfer Zip
 echo ================================
 echo.
-call :showLoading "Creating Transfer Zip" 10 "Creating Zip" "Please wait while we create the zip file..."
+
+:: Prompt the user to choose between default or Downloads directory
+echo Please choose where to save the Transfer Zip:
+echo 1. Default Directory (%backupBasePath%)
+echo 2. Downloads Folder (%USERPROFILE%\Downloads)
+set /p choice="Enter your choice (1 or 2): "
+
+:: Set the destination directory based on user choice
+if "%choice%"=="1" (
+    set "zipDestinationPath=%backupBasePath%"
+) else if "%choice%"=="2" (
+    set "zipPath=%USERPROFILE%\Downloads\%USERNAME%_HTFD-Transfer.zip"
+) else (
+    echo Invalid choice. Defaulting to the Default Directory.
+    set "zipDestinationPath=%backupBasePath%"
+)
 
 :: Ensure the backup directory exists
-call :ensureDirExists "%backupBasePath%"
+call :ensureDirExists "%zipDestinationPath%"
+
+:: Set the full path for the zip file
+set "zipPath=%zipDestinationPath%\Transfer.zip"
+
+:: Show the loading screen while creating the zip file
+call :showLoading "Creating Transfer Zip" 10 "Creating Zip" "Please wait while we create the zip file..."
 
 :: Create the zip file using PowerShell with detailed error reporting
 powershell -Command ^
@@ -294,6 +328,7 @@ if exist "%zipPath%" (
 )
 pause
 goto :transferMenu
+
 
 :extractTransferZip
 cls
@@ -383,9 +418,14 @@ echo This tool allows you to manage your TFD GameUserSettings.ini files,
 echo create transfer zips for easy transfers between PCs, and more.
 echo.
 echo Main Menu Options:
-echo [1] GameUserSettings Options - Manage your settings file.
-echo [2] Transfer (Zip/Unzip) Options - Create or extract a transfer zip.
-echo [3] Delete/Reset 'TFD Saved' Folder - Remove or reset the TFD saved folder.
+echo [1] Backup GameUserSettings.ini: Creates a backup of the GameUserSettings.ini file.
+echo [2] Restore GameUserSettings.ini: Restores the GameUserSettings.ini file from a backup.
+echo [3] Check Backup Integrity: Compares the current and backup files to check for changes.
+echo [4] Create Transfer Zip: Creates a ZIP file for transferring settings.
+echo [5] Extract Transfer Zip: Extracts a ZIP file to restore settings.
+echo [6] Delete/Reset 'TFD Saved' Folder: Permanently deletes the TFD Saved folder.
+echo [7] Display Version: Shows the current version of the tool.
+echo [8] Back to Main Menu
 echo.
 echo Press any key to return to the main menu...
 pause >nul
@@ -396,11 +436,14 @@ cls
 echo ================================
 echo   Harley's TFD Tool %version%
 echo         Goodbye Screen
+echo
+echo          @%USERNAME%
 echo ================================
 echo.
 echo Thank you for using Harley's TFD Tool.
-echo Your actions during this session were logged to:
-echo %logFile%
+echo for Support Contact @HarleyTG On Discord
+echo actions during this session were logged to:
+echo [%logFile%]
 echo.
 call :log "Session ended for user @%USERNAME%."
 
