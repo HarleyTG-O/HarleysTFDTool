@@ -10,6 +10,7 @@ set "backupBasePath=%USERPROFILE%\Documents\Harley's TFD Tool\%USERNAME%\%versio
 set "zipPath=%USERPROFILE%\Documents\Harley's TFD Tool\%USERNAME%\%version%\%USERNAME%_HTFD-Transfer.zip"
 set "logDir=%USERPROFILE%\Documents\Harley's TFD Tool\%USERNAME%\%version%\Logs"
 
+
 :: Get current date and time
 for /f "tokens=2 delims==" %%I in ('"wmic os get localdatetime /value"') do set "datetime=%%I"
 set "year=%datetime:~0,4%"
@@ -42,19 +43,40 @@ echo [1] GameUserSettings Options
 echo [2] Transfer (Zip/Unzip) Options
 echo [3] Delete/Reset 'TFD Saved' Folder
 echo [4] System Menu
-echo [5] Display Info
+echo [5] Info (included Support Server)
 echo [6] Help
 echo [7] Exit 
 echo ================================
 set /p choice="Enter your choice [1/2/3/4/5/6/7]: "
 
-if "%choice%"=="1" goto :gameUserSettingsMenu
-if "%choice%"=="2" goto :transferMenu
-if "%choice%"=="3" goto :deleteSaved
-if "%choice%"=="4" goto :systemMenu
-if "%choice%"=="5" goto :displayInfo
-if "%choice%"=="6" goto :helpMenu
-if "%choice%"=="7" goto :goodbye
+if "%choice%"=="1" (
+    call :log "User selected GameUserSettings Options."
+    goto :gameUserSettingsMenu
+)
+if "%choice%"=="2" (
+    call :log "User selected Transfer (Zip/Unzip) Options."
+    goto :transferMenu
+)
+if "%choice%"=="3" (
+    call :log "User selected Delete/Reset 'TFD Saved' Folder."
+    goto :deleteSaved
+)
+if "%choice%"=="4" (
+    call :log "User selected System Menu."
+    goto :systemMenu
+)
+if "%choice%"=="5" (
+    call :log "User selected Display Info."
+    goto :displayInfo
+)
+if "%choice%"=="6" (
+    call :log "User selected Help."
+    goto :helpMenu
+)
+if "%choice%"=="7" (
+    call :log "User selected Exit."
+    goto :goodbye
+)
 
 call :log "Invalid choice in main menu: %choice%"
 echo Invalid choice. Please try again.
@@ -80,8 +102,14 @@ echo [2] Exit: Close the tool.
 echo ================================
 set /p choice="Enter your choice [1/2]: "
 
-if "%choice%"=="1" goto :logAcceptanceScreen
-if "%choice%"=="2" goto :goodbye
+if "%choice%"=="1" (
+    call :log "User selected to start Harley's TFD Tool."
+    goto :logAcceptanceScreen
+)
+if "%choice%"=="2" (
+    call :log "User selected to exit from Welcome Screen."
+    goto :goodbye
+)
 
 call :log "Invalid choice in welcome screen: %choice%"
 echo Invalid choice. Please try again.
@@ -109,8 +137,14 @@ echo [2] Decline: Exit the tool.
 echo ================================
 set /p choice="Enter your choice [1/2]: "
 
-if "%choice%"=="1" goto :mainMenu
-if "%choice%"=="2" goto :goodbye
+if "%choice%"=="1" (
+    call :log "User accepted logging. Proceeding to Main Menu."
+    goto :mainMenu
+)
+if "%choice%"=="2" (
+    call :log "User declined logging. Exiting."
+    goto :goodbye
+)
 
 call :log "Invalid choice in log acceptance screen: %choice%"
 echo Invalid choice. Please try again.
@@ -133,10 +167,22 @@ echo [4] Back to Main Menu
 echo ================================
 set /p choice="Enter your choice [1/2/3/4]: "
 
-if "%choice%"=="1" goto :backupGameUserSettings
-if "%choice%"=="2" goto :restoreGameUserSettings
-if "%choice%"=="3" goto :checkIntegrity
-if "%choice%"=="4" goto :mainMenu
+if "%choice%"=="1" (
+    call :log "User selected to Backup GameUserSettings.ini."
+    goto :backupGameUserSettings
+)
+if "%choice%"=="2" (
+    call :log "User selected to Restore GameUserSettings.ini."
+    goto :restoreGameUserSettings
+)
+if "%choice%"=="3" (
+    call :log "User selected to Check Backup Integrity."
+    goto :checkIntegrity
+)
+if "%choice%"=="4" (
+    call :log "User selected to return to Main Menu from GameUserSettings."
+    goto :mainMenu
+)
 
 call :log "Invalid choice in GameUserSettings menu: %choice%"
 echo Invalid choice. Please try again.
@@ -244,9 +290,18 @@ echo [3] Back to Main Menu
 echo ================================
 set /p choice="Enter your choice [1/2/3]: "
 
-if "%choice%"=="1" goto :deleteAllLogs
-if "%choice%"=="2" goto :deleteSpecificLog
-if "%choice%"=="3" goto :mainMenu
+if "%choice%"=="1" (
+    call :log "User selected to Delete All Logs."
+    goto :deleteAllLogs
+)
+if "%choice%"=="2" (
+    call :log "User selected to Delete Specific Log."
+    goto :deleteSpecificLog
+)
+if "%choice%"=="3" (
+    call :log "User selected to return to Main Menu from System Menu."
+    goto :mainMenu
+)
 
 call :log "Invalid choice in System menu: %choice%"
 echo Invalid choice. Please try again.
@@ -266,21 +321,23 @@ echo Are you sure you want to proceed? [Y/N]
 set /p confirm="Enter your choice [Y/N]: "
 
 if /i "%confirm%"=="Y" (
+    call :log "User confirmed deletion of all logs."
     call :showLoading "Deleting All Logs" 10 "Deleting in progress" "Please wait while we remove all log files..."
 
     :: Delete all log files
     del /q "%logDir%\*.*"
     if exist "%logDir%\*.*" (
         echo ERROR: Failed to delete all logs. Check the log file for details.
-        call :log "Failed to delete all logs."
+        call :log "ERROR: Failed to delete all logs in %logDir%."
     ) else (
         echo.
         echo ================================
         echo   All Logs Deleted Successfully!
         echo ================================
-        call :log "Successfully deleted all logs."
+        call :log "Successfully deleted all logs in %logDir%."
     )
 ) else (
+    call :log "User canceled the 'Delete All Logs' operation."
     echo Operation canceled.
 )
 pause
@@ -372,16 +429,18 @@ echo ================================
 set /p choice=Select an option (1-2): 
 
 if "%choice%"=="1" (
+    call :log "User selected 'Join our Discord community'."
     start https://discord.gg/c2XrhjJ2Wf
     goto :mainMenu
 ) else if "%choice%"=="2" (
+    call :log "User selected 'Return to Main Menu'."
     goto :mainMenu
 ) else (
+    call :log "Invalid choice in Display Info menu: %choice%"
     echo Invalid choice. Please select 1 or 2.
     pause
     goto :displayInfo
 )
-
 
 :transferMenu
 cls
@@ -594,12 +653,6 @@ pause >nul
 :: Forcefully exit the script
 exit 0
 
-:: Function to log messages
-:log
-echo %~1 >> %logFile%
-exit /b
-
-
 
 :showLoading
 :: Arguments: [1] Message [2] Total Seconds [3] Action Type [4] Additional Message
@@ -639,18 +692,8 @@ for /L %%i in (1,1,%totalBars%) do (
 endlocal
 exit /b
 
+
+:: Function to log messages
 :log
-:: Parameters: %1=Log Message
-echo [%DATE% %TIME%] %~1 >> "%logFile%"
+echo %~1 >> "%logFile%"
 exit /b
-
-:ensureDirExists
-:: Parameters: %1=Directory Path
-if not exist "%~1" (
-    mkdir "%~1"
-    if errorlevel 1 (
-        call :log "Failed to create directory: %~1"
-    )
-)
-exit /b
-
