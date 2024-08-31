@@ -22,7 +22,7 @@ set "minute=%datetime:~10,2%"
 set "second=%datetime:~12,2%"
 
 :: Define log file name with formatted date and time
-set "logFile=%logDir%\%USERNAME%-Support_Log[%year%-%month%-%day%_%hour%-%minute%-%second%].txt"
+set "logFile=%logDir%\%USERNAME%-HTFD-Support_Log[%year%-%month%-%day%_%hour%-%minute%-%second%].txt"
 
 
 :: Ensure log directory exists
@@ -85,13 +85,42 @@ echo [2] Exit: Close the tool.
 echo ================================
 set /p choice="Enter your choice [1/2]: "
 
-if "%choice%"=="1" goto :mainMenu
+if "%choice%"=="1" goto :logAcceptanceScreen
 if "%choice%"=="2" goto :goodbye
 
 call :log "Invalid choice in welcome screen: %choice%"
 echo Invalid choice. Please try again.
 pause
 goto :welcomeScreen
+
+:logAcceptanceScreen
+cls
+echo ================================
+echo   Harley's TFD Tool %version%
+echo ================================
+echo      Log System Acceptance
+echo ================================
+echo.
+echo WARNING: This tool will generate logs for its operations.
+echo These logs will be stored in the following directory:
+echo %logDir%
+echo.
+echo By continuing, you agree to the collection and storage of
+echo log data as described above. Logs may be used for
+echo troubleshooting and support purposes.
+echo.
+echo [1] Accept: Proceed to the Main Menu.
+echo [2] Decline: Exit the tool.
+echo ================================
+set /p choice="Enter your choice [1/2]: "
+
+if "%choice%"=="1" goto :mainMenu
+if "%choice%"=="2" goto :goodbye
+
+call :log "Invalid choice in log acceptance screen: %choice%"
+echo Invalid choice. Please try again.
+pause
+goto :logAcceptanceScreen
 
 :gameUserSettingsMenu
 cls
