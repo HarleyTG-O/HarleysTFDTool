@@ -5,11 +5,11 @@ cls
 setlocal enabledelayedexpansion
 
 :: Constants
-set "version=[V2.5-Alpha]"
+set "version=[V1.6]"
 set "settingsPath=%USERPROFILE%\AppData\Local\M1\Saved\Config\Windows\"
-set "backupBasePath=%USERPROFILE%\Documents\Harley's TFD\V2\%USERNAME%\Backup"
-set "zipPath=%USERPROFILE%\Documents\Harley's TFD\V2\%USERNAME%\%USERNAME%_HTFD-Transfer.zip"
-set "logDir=%USERPROFILE%\Documents\Harley's TFD\V2\%USERNAME%\Logs"
+set "backupBasePath=%USERPROFILE%\Documents\Harley's TFD\%version%\%USERNAME%\Backup"
+set "zipPath=%USERPROFILE%\Documents\Harley's TFD\%version%\%USERNAME%\%USERNAME%_HTFD-Transfer.zip"
+set "logDir=%USERPROFILE%\Documents\Harley's TFD\%version%\%USERNAME%\Logs"
 
 
 :: Get current date and time
@@ -45,19 +45,21 @@ echo ================================
 echo.
 echo [1] GameUserSettings Options
 echo [2] Transfer (Zip/Unzip) Options
-echo [3] Delete/Reset 'TFD Saved' Folder 
-echo [4] Display Version
-echo [5] Help
-echo [6] Exit 
+echo [3] Delete/Reset 'TFD Saved' Folder
+echo [4] System Menu
+echo [5] Display Version
+echo [6] Help
+echo [7] Exit 
 echo ================================
-set /p choice="Enter your choice [1/2/3/4/5/6]: "
+set /p choice="Enter your choice [1/2/3/4/5/6/7]: "
 
 if "%choice%"=="1" goto :gameUserSettingsMenu
 if "%choice%"=="2" goto :transferMenu
 if "%choice%"=="3" goto :deleteSaved
-if "%choice%"=="4" goto :displayVersion
-if "%choice%"=="5" goto :helpMenu
-if "%choice%"=="6" goto :goodbye
+if "%choice%"=="4" goto :systemMenu
+if "%choice%"=="5" goto :displayVersion
+if "%choice%"=="6" goto :helpMenu
+if "%choice%"=="7" goto :goodbye
 
 call :log "Invalid choice in main menu: %choice%"
 echo Invalid choice. Please try again.
@@ -202,6 +204,103 @@ if exist "%settingsPath%\GameUserSettings.ini" (
 )
 pause
 goto :gameUserSettingsMenu
+
+:systemMenu
+cls
+echo ================================
+echo   Harley's TFD Tool %version%
+echo ================================
+echo       System Menu
+echo ================================
+echo.
+echo [1] Delete All Logs
+echo [2] Delete Specific Log
+echo [3] Back to Main Menu
+echo ================================
+set /p choice="Enter your choice [1/2/3]: "
+
+if "%choice%"=="1" goto :deleteAllLogs
+if "%choice%"=="2" goto :deleteSpecificLog
+if "%choice%"=="3" goto :mainMenu
+
+call :log "Invalid choice in System menu: %choice%"
+echo Invalid choice. Please try again.
+pause
+goto :systemMenu
+
+:deleteAllLogs
+cls
+echo ================================
+echo   Harley's TFD Tool %version%
+echo ================================
+echo   Deleting All Logs
+echo ================================
+echo.
+echo WARNING: This will delete all log files in the log directory.
+echo Are you sure you want to proceed? [Y/N]
+set /p confirm="Enter your choice [Y/N]: "
+
+if /i "%confirm%"=="Y" (
+    call :showLoading "Deleting All Logs" 10 "Deleting in progress" "Please wait while we remove all log files..."
+
+    :: Delete all log files
+    del /q "%logDir%\*.*"
+    if exist "%logDir%\*.*" (
+        echo ERROR: Failed to delete all logs. Check the log file for details.
+        call :log "Failed to delete all logs."
+    ) else (
+        echo.
+        echo ================================
+        echo   All Logs Deleted Successfully!
+        echo ================================
+        call :log "Successfully deleted all logs."
+    )
+) else (
+    echo Operation canceled.
+)
+pause
+goto :systemMenu
+
+:deleteSpecificLog
+cls
+echo ================================
+echo   Harley's TFD Tool %version%
+echo ================================
+echo  Deleting Specific Log
+echo ================================
+echo.
+echo Available logs:
+dir /b "%logDir%\*.txt"
+echo.
+set /p logToDelete="Enter the name of the log file to delete (e.g., username-Support_Log[YYYY-MM-DD_HH-MM-SS].txt): "
+
+:: Construct the full path to the log file
+set "logFileToDelete=%logDir%\%logToDelete%"
+
+:: Check if the log file exists
+if not exist "%logFileToDelete%" (
+    echo ERROR: Log file not found. Check the log file for details.
+    call :log "Attempted to delete '%logFileToDelete%' but file was not found."
+    echo Log file not found.
+    pause
+    goto :systemMenu
+)
+
+:: Delete the specific log file
+del /q "%logFileToDelete%"
+if exist "%logFileToDelete%" (
+    echo ERROR: Failed to delete '%logFileToDelete%'. Check the log file for details.
+    call :log "Failed to delete '%logFileToDelete%'."
+) else (
+    echo.
+    echo ================================
+    echo Log Deleted Successfully!
+    echo ================================
+    call :log "Successfully deleted '%logFileToDelete%'."
+)
+pause
+goto :systemMenu
+
 
 
 :checkIntegrity
