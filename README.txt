@@ -1,4 +1,7 @@
 # Harley's TFD Tool
+https://discord.gg/c2XrhjJ2Wf
+
+
 Harley's TFD Tool v1.0
 Description
 Harley's TFD Tool v1.0 is a versatile batch script designed to manage and transfer game settings for the game "The First Descendants" (TFD). The tool provides functionalities to back up, restore, and check the integrity of the GameUserSettings.ini file, as well as to create and extract transfer zip files for settings migration between PCs. It also includes options to delete/reset saved folders and access a help menu for user guidance.
