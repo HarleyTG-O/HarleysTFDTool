@@ -1,16 +1,14 @@
-
 @echo off
 title Harley's TFD Tool
 cls
 setlocal enabledelayedexpansion
 
 :: Constants
-set "version=[V1.6]"
+set "version=[V1.7]"
 set "settingsPath=%USERPROFILE%\AppData\Local\M1\Saved\Config\Windows\"
-set "backupBasePath=%USERPROFILE%\Documents\Harley's TFD\%version%\%USERNAME%\Backup"
-set "zipPath=%USERPROFILE%\Documents\Harley's TFD\%version%\%USERNAME%\%USERNAME%_HTFD-Transfer.zip"
-set "logDir=%USERPROFILE%\Documents\Harley's TFD\%version%\%USERNAME%\Logs"
-
+set "backupBasePath=%USERPROFILE%\Documents\Harley's TFD Tool\%USERNAME%\%version%\Backup"
+set "zipPath=%USERPROFILE%\Documents\Harley's TFD Tool\%USERNAME%\%version%\%USERNAME%_HTFD-Transfer.zip"
+set "logDir=%USERPROFILE%\Documents\Harley's TFD Tool\%USERNAME%\%version%\Logs"
 
 :: Get current date and time
 for /f "tokens=2 delims==" %%I in ('"wmic os get localdatetime /value"') do set "datetime=%%I"
@@ -24,11 +22,8 @@ set "second=%datetime:~12,2%"
 :: Define log file name with formatted date and time
 set "logFile=%logDir%\%USERNAME%-HTFD-Support_Log[%year%-%month%-%day%_%hour%-%minute%-%second%].txt"
 
-
 :: Ensure log directory exists
-if not exist "%logDir%" (
-    mkdir "%logDir%"
-)
+if not exist "%logDir%" mkdir "%logDir%"
 
 :: Initialize log file
 echo [%DATE% %TIME%] Harley's TFD Tool %version% [Started]. Logged in user @%USERNAME%. > "%logFile%"
@@ -47,7 +42,7 @@ echo [1] GameUserSettings Options
 echo [2] Transfer (Zip/Unzip) Options
 echo [3] Delete/Reset 'TFD Saved' Folder
 echo [4] System Menu
-echo [5] Display Version
+echo [5] Display Info
 echo [6] Help
 echo [7] Exit 
 echo ================================
@@ -57,7 +52,7 @@ if "%choice%"=="1" goto :gameUserSettingsMenu
 if "%choice%"=="2" goto :transferMenu
 if "%choice%"=="3" goto :deleteSaved
 if "%choice%"=="4" goto :systemMenu
-if "%choice%"=="5" goto :displayVersion
+if "%choice%"=="5" goto :displayInfo
 if "%choice%"=="6" goto :helpMenu
 if "%choice%"=="7" goto :goodbye
 
@@ -121,6 +116,7 @@ call :log "Invalid choice in log acceptance screen: %choice%"
 echo Invalid choice. Please try again.
 pause
 goto :logAcceptanceScreen
+
 
 :gameUserSettingsMenu
 cls
@@ -362,16 +358,30 @@ pause
 goto :gameUserSettingsMenu
 
 
-:displayVersion
+:displayInfo
 cls
 echo ================================
-echo    Harley's TFD Tool %version%
+echo      Harley's TFD Tool %version%
 echo ================================
 echo.
-echo   Current Version: %version%
+echo    Current Version: %version%
 echo ================================
-pause
-goto :mainMenu
+echo    1. Join our Discord community
+echo    2. Return to Main Menu
+echo ================================
+set /p choice=Select an option (1-2): 
+
+if "%choice%"=="1" (
+    start https://discord.gg/c2XrhjJ2Wf
+    goto :mainMenu
+) else if "%choice%"=="2" (
+    goto :mainMenu
+) else (
+    echo Invalid choice. Please select 1 or 2.
+    pause
+    goto :displayInfo
+)
+
 
 :transferMenu
 cls
@@ -628,6 +638,7 @@ for /L %%i in (1,1,%totalBars%) do (
 
 endlocal
 exit /b
+
 :log
 :: Parameters: %1=Log Message
 echo [%DATE% %TIME%] %~1 >> "%logFile%"
@@ -642,3 +653,4 @@ if not exist "%~1" (
     )
 )
 exit /b
+
