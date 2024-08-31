@@ -203,22 +203,26 @@ call :showLoading "Backing Up GameUserSettings.ini" 10 "Backup in progress" "Ple
 :: Ensure the target directory exists
 call :ensureDirExists "%backupBasePath%"
 
+:: Perform the backup operation
+set "sourceFile=%settingsPath%GameUserSettings.ini"
+set "destFile=%backupBasePath%\GameUserSettings_%date:~-4%-%date:~4,2%-%date:~7,2%_%time:~0,2%-%time:~3,2%.ini"
+
 :: Backup the file
-copy /y "%settingsPath%GameUserSettings.ini" "%backupBasePath%\GameUserSettings.ini" >nul
+copy /y "%sourceFile%" "%destFile%" >nul
 if errorlevel 1 (
-    call :log "Failed to copy GameUserSettings.ini from %settingsPath% to %backupBasePath%"
+    call :log "Failed to copy %sourceFile% to %destFile%"
     echo ERROR: Backup failed. Check the log file for details.
     pause
     goto :gameUserSettingsMenu
 )
 
 :: Check if the file was backed up successfully
-if exist "%backupBasePath%\GameUserSettings.ini" (
+if exist "%destFile%" (
     echo.
     echo ================================
     echo        Backup Successful!
     echo ================================
-    call :log "GameUserSettings.ini backed up successfully from %settingsPath% to %backupBasePath%"
+    call :log "GameUserSettings.ini backed up successfully to %destFile%"
 ) else (
     echo.
     echo ================================
@@ -229,6 +233,7 @@ if exist "%backupBasePath%\GameUserSettings.ini" (
 )
 pause
 goto :gameUserSettingsMenu
+
 
 :restoreGameUserSettings
 cls
